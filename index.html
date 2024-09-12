@@ -2,13 +2,112 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <title>Deine Web-App</title>
-    <!-- Weitere Meta-Tags und CSS hier -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="white">
+    <link rel="apple-touch-icon" href="safari.png">
+    <title>URL im iframe anzeigen</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #input-screen, #iframe-screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+        #input-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
 </head>
 <body>
-    TEst 
+
+<div id="input-screen">
+    <h2>Geben Sie eine URL ein:</h2>
+    <input type="url" id="url-input" placeholder="https://example.com">
+    <button onclick="loadIframe()">Laden</button>
+</div>
+
+<div id="iframe-screen">
+    <iframe id="url-iframe"></iframe>
+</div>
+
+<script>
+    // Funktion zum Laden des iframes
+    function loadIframe() {
+        const url = document.getElementById('url-input').value;
+        if (url) {
+            document.getElementById('url-iframe').src = url;
+            document.cookie = `savedURL=${url}; path=/; max-age=31536000;`; // Cookie für 1 Jahr setzen
+            showIframeScreen();
+        }
+    }
+
+    // Funktion zum Anzeigen des iframe-Screens
+    function showIframeScreen() {
+        document.getElementById('input-screen').style.display = 'none';
+        document.getElementById('iframe-screen').style.display = 'flex';
+    }
+
+    // Funktion zum Anzeigen des Input-Screens
+    function showInputScreen() {
+        document.getElementById('iframe-screen').style.display = 'none';
+        document.getElementById('input-screen').style.display = 'flex';
+    }
+
+    // Funktion zum Laden der gespeicherten URL aus dem Cookie
+    function getSavedURL() {
+        const cookieValue = document.cookie.split('; ').find(row => row.startsWith('savedURL='));
+        return cookieValue ? cookieValue.split('=')[1] : '';
+    }
+
+    // Initialisierung beim Laden der Seite
+    window.onload = function() {
+        const savedURL = getSavedURL();
+        if (savedURL) {
+            document.getElementById('url-iframe').src = savedURL;
+            showIframeScreen();
+        } else {
+            showInputScreen();
+        }
+    };
+
+    // Event Listener für das Drücken der "X"-Taste
+    window.addEventListener('keydown', function(event) {
+        if (event.key.toLowerCase() === 'x' && document.getElementById('iframe-screen').style.display === 'flex') {
+            showInputScreen();
+        }
+    });
+</script>
+
 </body>
 </html>
